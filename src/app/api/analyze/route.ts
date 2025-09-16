@@ -66,7 +66,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const prompt = ANALYSIS_PROMPT.replace('{content}', content);
+    // 텍스트 길이 제한 (약 8,000자 = 약 10,000 토큰으로 안전하게)
+    const truncatedContent = content.length > 8000
+      ? content.substring(0, 8000) + '\n\n[... 내용이 길어서 일부만 분석됩니다]'
+      : content;
+
+    const prompt = ANALYSIS_PROMPT.replace('{content}', truncatedContent);
 
     const completion = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
